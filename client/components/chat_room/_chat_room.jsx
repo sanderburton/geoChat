@@ -1,9 +1,10 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ApiContext } from '../../utils/api_context';
 
 import { Button } from '../common/button';
 import { useMessages } from '../../utils/use_messages';
+import { Message } from './_message';
 
 export const ChatRoom = () => {
   const [chatRoom, setChatRoom] = useState(null);
@@ -12,8 +13,8 @@ export const ChatRoom = () => {
   const [user, setUser] = useState(null);
   const api = useContext(ApiContext);
   const { id } = useParams();
-  console.log(id);
   const [messages, sendMessage] = useMessages(chatRoom);
+  const navigate = useNavigate();
 
   useEffect(async () => {
     const { user } = await api.get('/users/me');
@@ -24,20 +25,29 @@ export const ChatRoom = () => {
   }, []);
 
   if (loading) return 'Loading...';
+  console.log(messages);
 
   return (
-    <div>
-      <div>
+    <div className="vertical-flex">
+      <Button className="back-button my-button" onClick={() => navigate('/')}>
+        Back to Rooms
+      </Button>
+      <div className="main-title">{chatRoom.name}</div>
+      <div className="messages-area">
         {messages.map((message) => (
-          <div key={message.id}>
-            <h3>{message.userName}</h3>
-            {message.contents}
-          </div>
+          <Message key={message.id} message={message} />
         ))}
       </div>
-      <div>
-        <input type="text" value={contents} onChange={(e) => setContents(e.target.value)} />
-        <Button onClick={() => sendMessage(contents, user)}>Send</Button>
+      <div className="horizontal-flex">
+        <textarea className="message-typer top-margin" value={contents} onChange={(e) => setContents(e.target.value)} />
+        <Button
+          onClick={() => {
+            sendMessage(contents, user);
+            setContents('');
+          }}
+        >
+          Send
+        </Button>
       </div>
     </div>
   );

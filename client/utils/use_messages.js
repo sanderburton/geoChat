@@ -10,7 +10,6 @@ export const useMessages = (chatRoom) => {
 
   useEffect(() => {
     if (chatRoom) {
-      console.log(chatRoom.id);
       const socket = io({
         auth: {
           token: authToken,
@@ -22,12 +21,10 @@ export const useMessages = (chatRoom) => {
 
       setSocket(socket);
       socket.on('message', (message) => {
-        console.log(messages);
         messagesRef.current.push(message);
         setMessages([...messagesRef.current]);
       });
       socket.on('initial-messages', (messages) => {
-        console.log(messages);
         messagesRef.current = messages;
         setMessages(messages);
       });
